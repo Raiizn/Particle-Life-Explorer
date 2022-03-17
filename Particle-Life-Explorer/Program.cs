@@ -2,11 +2,10 @@
 {
     public static class Program
     {
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             var form = new MainForm();
             form.ShowDialog();
-            return 0;
         }
     }
 }

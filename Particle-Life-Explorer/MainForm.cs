@@ -3,14 +3,17 @@ using OpenGL;
 using Particle_Life_Explorer.Gfx;
 using System;
 using System.Text;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace Particle_Life_Explorer
 {
     public partial class MainForm : Form
     {
-        GlProgram glProgram;
-        VertexArray vertices;
+        ShaderProgram shader;
+        Circle circleOne, circleTwo;
+        Viewport view;
+
         public MainForm()
         {
             InitializeComponent();
@@ -56,19 +59,18 @@ namespace Particle_Life_Explorer
             if(!supported)
                 throw new Exception("Unsupported OpenGL version: " + Gl.CurrentVersion);
 
-            glProgram = GlProgram.Default();
-            Gl.UseProgram(glProgram.ProgramName);
-            circleOne = new Circle(glProgram, 32, 1f, 0);
-            circleTwo = new Circle(glProgram, 64, 0, 0, System.Drawing.Color.Blue);
+            shader = ShaderProgram.Default();
+            Gl.UseProgram(shader.ProgramName);
+            view = new Viewport(glControl, glControl.Width, glControl.Height);
+            circleOne = new Circle(shader, 25);
+            circleTwo = new Circle(shader, 10, System.Drawing.Color.Blue);
 
         }
 
 
-        Circle circleOne, circleTwo;
-
         private void openGL_control_ContextDestroying(object sender, OpenGL.GlControlEventArgs e)
         {
-            glProgram.Dispose();
+            shader.Dispose();
         }
 
 
@@ -77,6 +79,10 @@ namespace Particle_Life_Explorer
 
         }
 
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Environment.Exit(0);
+        }
 
         private void openGL_control_Render(object sender, OpenGL.GlControlEventArgs e)
         {
@@ -88,11 +94,9 @@ namespace Particle_Life_Explorer
             Gl.Clear(ClearBufferMask.ColorBufferBit);
 
             // Render the test circles
-            float w = senderControl.ClientSize.Width / 2f;
-            float h = senderControl.ClientSize.Height / 2f;
-            Matrix4x4f projection = Matrix4x4f.Ortho2D(-w, w, -h, h);
-            circleOne.Render(glProgram, projection);
-            circleTwo.Render(glProgram, projection);
+            var viewMatrix = view.GetViewMatrix();
+            circleOne.Render(viewMatrix, new float[] { 0, 0});
+            circleTwo.Render(viewMatrix, new float[] { 230, 0 });
 
         }
         #endregion

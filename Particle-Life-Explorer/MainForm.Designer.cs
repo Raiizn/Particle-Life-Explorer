@@ -53,6 +53,9 @@
             // 
             // panel3
             // 
+            this.panel3.AutoScroll = true;
+            this.panel3.AutoSize = true;
+            this.panel3.BackColor = System.Drawing.Color.Black;
             this.panel3.Controls.Add(this.openGL_control);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(146, 52);
@@ -62,12 +65,13 @@
             // 
             // openGL_control
             // 
+            this.openGL_control.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.openGL_control.Animation = true;
-            this.openGL_control.AutoSize = true;
             this.openGL_control.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.openGL_control.ColorBits = ((uint)(24u));
             this.openGL_control.DepthBits = ((uint)(0u));
-            this.openGL_control.Dock = System.Windows.Forms.DockStyle.Fill;
             this.openGL_control.Location = new System.Drawing.Point(0, 0);
             this.openGL_control.MultisampleBits = ((uint)(0u));
             this.openGL_control.Name = "openGL_control";
@@ -89,11 +93,12 @@
             this.Controls.Add(this.panel1);
             this.Name = "MainForm";
             this.Text = "MainForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
