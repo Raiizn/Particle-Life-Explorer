@@ -2,6 +2,7 @@
 using OpenGL;
 using Particle_Life_Explorer.Gfx;
 using System;
+using System.Drawing;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
@@ -59,11 +60,11 @@ namespace Particle_Life_Explorer
             if(!supported)
                 throw new Exception("Unsupported OpenGL version: " + Gl.CurrentVersion);
 
-            shader = ShaderProgram.Default();
+            shader = new ShaderProgram(GlShaders.VertexBasic, GlShaders.FragmentSingleColor);
             Gl.UseProgram(shader.ProgramName);
             view = new Viewport(glControl, glControl.Width, glControl.Height);
             circleOne = new Circle(shader, 25);
-            circleTwo = new Circle(shader, 10, System.Drawing.Color.Blue);
+            circleTwo = new Circle(shader, 10, Color.Red);
 
         }
 

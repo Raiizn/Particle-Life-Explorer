@@ -25,5 +25,26 @@ namespace Particle_Life_Explorer.Gfx
             "	gl_FragColor = vec4(vColor, 1.0);\n",
             "}\n"
         };
+
+        public readonly static string[] VertexBasic =
+        {
+            "#version 330 core\n",
+            "uniform mat4 uMVP;\n",
+            "in vec2 aPosition;\n",
+            "out vec4 gl_Position;\n",
+            "void main() {\n",
+            "	gl_Position = uMVP * vec4(aPosition, 0.0, 1.0);\n",
+            "}\n"
+        };
+
+        public readonly static string[] FragmentSingleColor =
+        {
+            "#version 330 core\n",
+            "uniform vec3 color;\n",
+            "out vec4 gl_FragColor;\n",
+            "void main() {\n",
+            "   gl_FragColor = vec4(color, 1.0);\n",
+            "}\n"
+        };
     }
 }

@@ -13,6 +13,7 @@ namespace Particle_Life_Explorer.Gfx
     {
         static float[] shared_vertices = null;
         Color _color;
+        float[] _colorf;
         ShaderProgram shader;
         VertexArray vertexArray;
 
@@ -21,8 +22,8 @@ namespace Particle_Life_Explorer.Gfx
             List<float> buffer = new List<float>();
             for (double i = 0; i < 2 * Math.PI; i += 2 * Math.PI / vertex_count)
             {
-                buffer.Add((float)Math.Cos(i) * 0.5f);
-                buffer.Add((float)Math.Sin(i) * 0.5f);
+                buffer.Add((float)Math.Cos(i));
+                buffer.Add((float)Math.Sin(i));
             }
             shared_vertices = buffer.ToArray();
         }
@@ -35,11 +36,12 @@ namespace Particle_Life_Explorer.Gfx
 
             if (color == default(Color))
                 color = Color.White;
-            this.shader = glProgram;
 
+            _colorf = new float[3];
+            this.shader = glProgram;
             Radius = radius;
-            _color = color;
-            GenerateVertexArray();
+            Color = color;
+            vertexArray = new VertexArray(shader, shared_vertices);
         }
 
 
@@ -61,25 +63,9 @@ namespace Particle_Life_Explorer.Gfx
                 if (value != _color)
                 {
                     _color = value;
-                    GenerateVertexArray();
+                    _colorf = new float[]{ Color.R / 255f, Color.G / 255f, Color.B / 255f};
                 }
             }
-        }
-
-
-        void GenerateVertexArray()
-        {
-            List<float> buffer = new List<float>();
-            float r = Color.R / 255f;
-            float g = Color.G / 255f;
-            float b = Color.B / 255f;
-            for (int i = 0; i < shared_vertices.Length; i += 1)
-            {
-                buffer.Add(r);
-                buffer.Add(g);
-                buffer.Add(b);
-            }
-            vertexArray = new VertexArray(shader, shared_vertices, buffer.ToArray());
         }
 
 
@@ -87,8 +73,10 @@ namespace Particle_Life_Explorer.Gfx
         {
             Gl.BindVertexArray(vertexArray.ArrayName);
             Matrix4x4f translation = Matrix4x4f.Translated(pos[0], pos[1], 0.0f);
-            Matrix4x4f scale = Matrix4x4f.Scaled(2 *Radius, 2 *Radius, 1);
-            Gl.UniformMatrix4f(shader.LocationMVP, 1, false, scale * translation * projection);
+            Matrix4x4f scale = Matrix4x4f.Scaled(Radius, Radius, 1);
+
+            Gl.UniformMatrix4f(shader.LocationMVP, 1, false, (scale * translation) * projection);
+            Gl.Uniform3(shader.GetUniformID("color"), _colorf);
             Gl.DrawArrays(PrimitiveType.TriangleFan, 0, shared_vertices.Length);
         }
     }

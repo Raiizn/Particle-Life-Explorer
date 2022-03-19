@@ -1,6 +1,5 @@
 ﻿
 using OpenGL;
-using System.Windows;
 
 namespace Particle_Life_Explorer.Gfx
 {
@@ -46,8 +45,8 @@ namespace Particle_Life_Explorer.Gfx
         public Matrix4x4f GetViewMatrix()
         {
             var projection = Matrix4x4f.Ortho2D(-Width / 2, Width / 2, -Height / 2, Height / 2);
-            var translate = Matrix4x4f.Translated(X, Y, 0);
-            return translate * projection;
+            var view_pos = Matrix4x4f.Translated(X, Y, 0);
+            return view_pos * projection;
         }
 
 

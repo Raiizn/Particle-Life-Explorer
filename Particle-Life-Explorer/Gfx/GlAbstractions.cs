@@ -1,5 +1,6 @@
 ﻿using OpenGL;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 /// <summary>
@@ -82,14 +83,13 @@ namespace Particle_Life_Explorer.Gfx
     /// </summary>
     class VertexArray : IDisposable
     {
-        public VertexArray(ShaderProgram program, float[] positions, float[] colors)
+        public VertexArray(ShaderProgram program, float[] positions)
         {
             if (program == null)
                 throw new ArgumentNullException(nameof(program));
 
             // Allocate buffers referenced by this vertex array
             _BufferPosition = new Buffer(positions);
-            _BufferColor = new Buffer(colors);
 
             // Generate VAO name
             ArrayName = Gl.GenVertexArray();
@@ -104,25 +104,18 @@ namespace Particle_Life_Explorer.Gfx
             Gl.VertexAttribPointer((uint)program.LocationPosition, 2, VertexAttribType.Float, false, 0, IntPtr.Zero);
             // Enable attribute
             Gl.EnableVertexAttribArray((uint)program.LocationPosition);
-
-            // As above, but for color attribute
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, _BufferColor.BufferName);
-            Gl.VertexAttribPointer((uint)program.LocationColor, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
-            Gl.EnableVertexAttribArray((uint)program.LocationColor);
         }
 
         public readonly uint ArrayName;
 
         private readonly Buffer _BufferPosition;
 
-        private readonly Buffer _BufferColor;
 
         public void Dispose()
         {
             Gl.DeleteVertexArrays(ArrayName);
 
             _BufferPosition.Dispose();
-            _BufferColor.Dispose();
         }
     }
 
@@ -132,14 +125,12 @@ namespace Particle_Life_Explorer.Gfx
     /// </summary>
     class ShaderProgram : IDisposable
     {
-        public static ShaderProgram Default()
-        {
-            return new ShaderProgram(GlShaders.VertexSource, GlShaders.FragmentSource);
-        }
-
-
+        Dictionary<string, int> uniforms;
+        Dictionary<string, int> attributes;
         public ShaderProgram(string[] vertexSource, string[] fragmentSource)
         {
+            uniforms = new Dictionary<string, int>();
+            attributes = new Dictionary<string, int>();
             // Create vertex and fragment shaders
             // Note: they can be disposed after linking to program; resources are freed when deleting the program
             using (GLObject vObject = new GLObject(ShaderType.VertexShader, vertexSource))
@@ -155,9 +146,7 @@ namespace Particle_Life_Explorer.Gfx
 
                 // Check linkage status
                 int linked;
-
                 Gl.GetProgram(ProgramName, ProgramProperty.LinkStatus, out linked);
-
                 if (linked == 0)
                 {
                     const int logMaxLength = 1024;
@@ -170,25 +159,63 @@ namespace Particle_Life_Explorer.Gfx
                     throw new InvalidOperationException($"unable to link program: {infolog}");
                 }
 
-                // Get uniform locations
-                if ((LocationMVP = Gl.GetUniformLocation(ProgramName, "uMVP")) < 0)
-                    throw new InvalidOperationException("no uniform uMVP");
-
-                // Get attributes locations
-                if ((LocationPosition = Gl.GetAttribLocation(ProgramName, "aPosition")) < 0)
-                    throw new InvalidOperationException("no attribute aPosition");
-                if ((LocationColor = Gl.GetAttribLocation(ProgramName, "aColor")) < 0)
-                    throw new InvalidOperationException("no attribute aColor");
             }
         }
 
         public readonly uint ProgramName;
 
-        public readonly int LocationMVP;
+        public int LocationMVP
+        {
+            get
+            {
+                return GetUniformID("uMVP");
+            }
+        }
 
-        public readonly int LocationPosition;
+        public int LocationPosition
+        {
+            get
+            {
+                return GetAttributeID("aPosition");
+            }
+        }
 
-        public readonly int LocationColor;
+
+        public bool HasAttribute(string name)
+        {
+            int value = Gl.GetAttribLocation(ProgramName, name);
+            return (value >= 0);
+        }
+
+
+        public int GetAttributeID(string name)
+        {
+            if (!attributes.ContainsKey(name))
+            {
+                if (!HasAttribute(name))
+                    throw new InvalidOperationException("Shader program missing attribute: " + name);
+                attributes[name] = Gl.GetAttribLocation(ProgramName, name);
+            }
+            return attributes[name];
+        }
+
+
+        public bool HasUniform(string name)
+        {
+            int value = Gl.GetUniformLocation(ProgramName, name);
+            return (value >= 0);
+        }
+
+        public int GetUniformID(string name)
+        {
+            if (!uniforms.ContainsKey(name))
+            {
+               if(!HasUniform(name))
+                    throw new InvalidOperationException("Shader program missing uniform: " + name);
+                uniforms[name] = Gl.GetUniformLocation(ProgramName, name);
+            }
+            return uniforms[name];
+        }
 
         public void Dispose()
         {
