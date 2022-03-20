@@ -1,7 +1,9 @@
 ﻿using Khronos;
 using OpenGL;
 using Particle_Life_Explorer.Gfx;
+using Particle_Life_Explorer.Sim;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows;
@@ -12,12 +14,29 @@ namespace Particle_Life_Explorer
     public partial class MainForm : Form
     {
         ShaderProgram shader;
-        Circle circleOne, circleTwo;
         Viewport view;
+        Simulation simulation;
 
         public MainForm()
         {
             InitializeComponent();
+        }
+
+
+        void CreateSimulation()
+        {
+            GlControl glControl = openGL_control;
+            var particle_types = new List<ParticleClass>()
+            {
+                new ParticleClass(Color.Red),
+                new ParticleClass(Color.Blue),
+                new ParticleClass(Color.Green),
+                new ParticleClass(Color.Magenta),
+                new ParticleClass(Color.Aqua),
+                new ParticleClass(Color.Yellow)
+            };
+            simulation = new Simulation(glControl.Width, glControl.Height, particle_types, particle_types.Count * 5);
+
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -63,10 +82,10 @@ namespace Particle_Life_Explorer
             shader = new ShaderProgram(GlShaders.VertexBasic, GlShaders.FragmentSingleColor);
             Gl.UseProgram(shader.ProgramName);
             view = new Viewport(glControl, glControl.Width, glControl.Height);
-            circleOne = new Circle(shader, 25);
-            circleTwo = new Circle(shader, 10, Color.Red);
-
+            CreateSimulation();
+            simulation.SetParticleGraphic(new Circle(shader, 8));
         }
+
 
 
         private void openGL_control_ContextDestroying(object sender, OpenGL.GlControlEventArgs e)
@@ -77,7 +96,7 @@ namespace Particle_Life_Explorer
 
         private void openGL_control_ContextUpdate(object sender, OpenGL.GlControlEventArgs e)
         {
-
+            simulation.Update();
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -91,16 +110,22 @@ namespace Particle_Life_Explorer
             Control senderControl = (Control)sender;
 
             // Clear
-            Gl.Viewport(0, 0, senderControl.ClientSize.Width, senderControl.ClientSize.Height);
+            int w = senderControl.ClientSize.Width;
+            int h = senderControl.ClientSize.Height;
+            Gl.Viewport(0, 0, w, h);
             Gl.Clear(ClearBufferMask.ColorBufferBit);
 
             // Render the test circles
             var viewMatrix = view.GetViewMatrix();
-            circleOne.Render(viewMatrix, new float[] { 0, 0});
-            circleTwo.Render(viewMatrix, new float[] { 230, 0 });
-
+            simulation.Draw(viewMatrix);
         }
         #endregion
 
+        private void resetBtn_Click(object sender, EventArgs e)
+        {
+            var gfx = simulation.PartGraphic;
+            CreateSimulation();
+            simulation.SetParticleGraphic(gfx);
+        }
     }
 }

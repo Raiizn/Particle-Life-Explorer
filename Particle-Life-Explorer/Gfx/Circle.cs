@@ -1,5 +1,4 @@
-﻿
-using OpenGL;
+﻿using OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,10 +11,9 @@ namespace Particle_Life_Explorer.Gfx
     internal class Circle
     {
         static float[] shared_vertices = null;
-        Color _color;
-        float[] _colorf;
         ShaderProgram shader;
         VertexArray vertexArray;
+
 
         private static void GenerateGeometry(int vertex_count=20)
         {
@@ -29,18 +27,13 @@ namespace Particle_Life_Explorer.Gfx
         }
 
 
-        public Circle(ShaderProgram glProgram, float radius, Color color = default(Color))
+        public Circle(ShaderProgram glProgram, float radius)
         {
             if (shared_vertices == null)
                 GenerateGeometry();
 
-            if (color == default(Color))
-                color = Color.White;
-
-            _colorf = new float[3];
             this.shader = glProgram;
             Radius = radius;
-            Color = color;
             vertexArray = new VertexArray(shader, shared_vertices);
         }
 
@@ -51,21 +44,10 @@ namespace Particle_Life_Explorer.Gfx
         }
 
 
-        public Color Color
+        public void SetDrawColor(Color color)
         {
-            get
-            {
-                return _color;
-            }
-
-            set
-            {
-                if (value != _color)
-                {
-                    _color = value;
-                    _colorf = new float[]{ Color.R / 255f, Color.G / 255f, Color.B / 255f};
-                }
-            }
+            float[] _colorf = new float[] { color.R / 255f, color.G / 255f, color.B / 255f };
+            Gl.Uniform3(shader.GetUniformID("color"), _colorf);
         }
 
 
@@ -76,7 +58,6 @@ namespace Particle_Life_Explorer.Gfx
             Matrix4x4f scale = Matrix4x4f.Scaled(Radius, Radius, 1);
 
             Gl.UniformMatrix4f(shader.LocationMVP, 1, false, (scale * translation) * projection);
-            Gl.Uniform3(shader.GetUniformID("color"), _colorf);
             Gl.DrawArrays(PrimitiveType.TriangleFan, 0, shared_vertices.Length);
         }
     }

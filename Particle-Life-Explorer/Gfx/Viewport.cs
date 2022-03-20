@@ -31,7 +31,6 @@ namespace Particle_Life_Explorer.Gfx
         }
        
 
-
         public Viewport(OpenGL.GlControl glControl, float width, float height)
         {
             this.glControl = glControl;
