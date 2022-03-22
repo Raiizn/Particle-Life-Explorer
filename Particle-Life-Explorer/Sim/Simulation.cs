@@ -22,11 +22,10 @@ namespace Particle_Life_Explorer.Sim
         public float Height { get; private set; }
         public float PixelsPerUnit { get; set; }
         public float Friction { get; set; }
-        public void AddInteraction(InteractionDef def)
+        public IEnumerable<ParticleClass> ParticleClasses
         {
-            interaction_table[def.A.Index, def.B.Index] = def.Interaction;
+            get { return particles.Keys; }
         }
-
 
         /// <summary>
         /// Main constructor.
@@ -40,24 +39,31 @@ namespace Particle_Life_Explorer.Sim
             this.particles = new Dictionary<ParticleClass, List<Particle>>();
             foreach (var type in particle_types)
                 particles[type] = new List<Particle>();
-            Random random = new Random();
-
-            float center_x = this.Width / 2;
-            float center_y = this.Height / 2;
-            // Evenly generate particles for each given particle class 
-            for (int i = 0; i < initial_particle_count; i++)
-            {
-                ParticleClass type = particle_types[i % particle_types.Count];
-
-                particles[type].Add(new Particle(this, type, (float)random.NextDouble()*Width, (float)random.NextDouble()*height));
-            }
 
             interaction_table = new Interaction[ParticleClass.IndexCount, ParticleClass.IndexCount];
             for (int i = 0; i < interaction_table.GetLength(0); i++)
                 for (int j = 0; j < interaction_table.GetLength(1); j++)
                     interaction_table[i, j] = null;
 
+            ReseedParticles(initial_particle_count);
             timer = DateTime.MaxValue;
+        }
+
+
+        public void ReseedParticles(int particle_count)
+        {
+            Random random = new Random();
+
+            // Evenly generate particles for each given particle class 
+            foreach (var particle_list in particles.Values)
+                particle_list.Clear();
+            List<ParticleClass> particle_types = new List<ParticleClass>(particles.Keys);
+            for (int i = 0; i < particle_count; i++)
+            {
+                ParticleClass type = particle_types[i % particle_types.Count];
+                particles[type].Add(new Particle(this, type, (float)random.NextDouble() * Width, (float)random.NextDouble() * Height));
+            }
+
         }
 
 
@@ -65,6 +71,13 @@ namespace Particle_Life_Explorer.Sim
         {
             PartGraphic = drawable;
         }
+
+
+        public void AddInteraction(InteractionDef def)
+        {
+            interaction_table[def.A.Index, def.B.Index] = def.Interaction;
+        }
+
 
 
         public Interaction GetInteraction(ParticleClass A, ParticleClass B)

@@ -1,10 +1,12 @@
 ﻿using Khronos;
+using Newtonsoft.Json;
 using OpenGL;
 using Particle_Life_Explorer.Gfx;
 using Particle_Life_Explorer.Sim;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Numerics;
 using System.Text;
 using System.Windows;
@@ -38,18 +40,18 @@ namespace Particle_Life_Explorer
         void CreateSimulation()
         {
             GlControl glControl = openGL_control;
-            float friction = 0.025f;
+            float friction = 0.125f;
             int particle_count = 200;
             // Set up the different particle types
             ParticleClass.ResetIndices();
             var particle_types = new List<ParticleClass>()
             {
-                new ParticleClass(Color.Red),
-                new ParticleClass(Color.Blue),
-                new ParticleClass(Color.Green),
-                new ParticleClass(Color.Magenta),
-                new ParticleClass(Color.Aqua),
-                new ParticleClass(Color.Yellow)
+                new ParticleClass("A", Color.Red),
+                new ParticleClass("B", Color.Blue),
+                new ParticleClass("C", Color.Green),
+                new ParticleClass("D", Color.Magenta),
+                new ParticleClass("E", Color.Aqua),
+                new ParticleClass("F", Color.Yellow)
             };
             simulation = new Simulation(PIXELS_PER_UNIT, initial_size.X, initial_size.Y, particle_types, particle_count, friction);
 
@@ -164,6 +166,42 @@ namespace Particle_Life_Explorer
             var gfx = simulation.PartGraphic;
             CreateSimulation();
             simulation.SetParticleGraphic(gfx);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            simulation.ReseedParticles(200);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Basic serialization
+            string path = "settings.json";
+            var json_settings = new JsonSerializerSettings() { Formatting = Formatting.Indented };
+
+            // Setup wrapping structures
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            List<ParticleClass> particles = new List<ParticleClass>(simulation.ParticleClasses);
+            List<object> interactions = new List<object>();
+            values["Particles"] = particles;
+            values["Interactions"] = interactions;
+
+            foreach(var partA in particles)
+            {
+                foreach(var partB in particles)
+                {
+                    var interaction = simulation.GetInteraction(partA, partB);
+                    if (interaction != null)
+                        interactions.Add(new Dictionary<string, object>()
+                        {
+                            {"left", partA.Name },
+                            {"right", partB.Name },
+                            {"value", interaction }
+                        });
+                }
+            }
+            string json = JsonConvert.SerializeObject(values, json_settings);
+            File.WriteAllText(path, json);
         }
     }
 }

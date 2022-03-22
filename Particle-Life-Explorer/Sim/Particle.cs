@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
@@ -8,11 +9,10 @@ namespace Particle_Life_Explorer.Sim
     /// <summary>
     /// Represents a class of particle and its properties and interactions.
     /// </summary>
+    [Serializable]
     internal class ParticleClass
     {
         static int last_index = 0;
-        
-        
         public static int IndexCount { get { return last_index; } }
 
         public static void ResetIndices()
@@ -20,17 +20,30 @@ namespace Particle_Life_Explorer.Sim
             last_index = 0;
         }
 
-        public int Index { get; private set; }
-        public Color Color { get; set; }
+
+        public string Name { get; protected set; }
+
+        public Color Color { get; protected set; }
+
+        [JsonIgnore()]
+        public int Index { get; protected set; }
 
 
-        public ParticleClass(Color color)
+        public ParticleClass(string name, Color color)
         {
             Index = last_index;
+            Name = name;
             Color = color;
             last_index += 1;
         }
 
+
+        public ParticleClass(int index, string name, Color color)
+        {
+            Index = index;
+            Name = name;
+            Color = color;
+        }
 
         public float GetAttraction(Interaction interaction, float distance)
         {
@@ -124,8 +137,8 @@ namespace Particle_Life_Explorer.Sim
 
             // Determine force to apply for this interaction
             float force = 0;
-            if (distance < 1 && distance > 0)
-                force = -1f * (float)Math.Max(1, velocity.Length()/2) / distance; // Repelling force for close particles
+            if (distance <= 1)
+                force = -1f * (float)Math.Max(0.2f, Math.Pow(velocity.Length(), 1f)) / distance*distance; // Repelling force for close particles
             else
                 force = type.GetAttraction(interaction, distance); // Interaction based force
 

@@ -30,6 +30,8 @@
         {
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.resetBtn = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
             this.openGL_control = new OpenGL.GlControl();
@@ -47,6 +49,8 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.button2);
+            this.panel2.Controls.Add(this.button1);
             this.panel2.Controls.Add(this.resetBtn);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(0, 52);
@@ -54,16 +58,42 @@
             this.panel2.Size = new System.Drawing.Size(146, 616);
             this.panel2.TabIndex = 1;
             // 
+            // button2
+            // 
+            this.button2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button2.Location = new System.Drawing.Point(0, 78);
+            this.button2.Margin = new System.Windows.Forms.Padding(2);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(146, 39);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Save Settings";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button1
+            // 
+            this.button1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(0, 39);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(146, 39);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "Reseed";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // resetBtn
             // 
             this.resetBtn.Dock = System.Windows.Forms.DockStyle.Top;
             this.resetBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.resetBtn.Location = new System.Drawing.Point(0, 0);
-            this.resetBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.resetBtn.Margin = new System.Windows.Forms.Padding(2);
             this.resetBtn.Name = "resetBtn";
             this.resetBtn.Size = new System.Drawing.Size(146, 39);
             this.resetBtn.TabIndex = 0;
-            this.resetBtn.Text = "Reset";
+            this.resetBtn.Text = "Randomize Rules";
             this.resetBtn.UseVisualStyleBackColor = true;
             this.resetBtn.Click += new System.EventHandler(this.resetBtn_Click);
             // 
@@ -89,7 +119,7 @@
             this.openGL_control.ColorBits = ((uint)(24u));
             this.openGL_control.DepthBits = ((uint)(0u));
             this.openGL_control.Location = new System.Drawing.Point(0, 0);
-            this.openGL_control.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.openGL_control.Margin = new System.Windows.Forms.Padding(4);
             this.openGL_control.MultisampleBits = ((uint)(0u));
             this.openGL_control.Name = "openGL_control";
             this.openGL_control.Size = new System.Drawing.Size(880, 616);
@@ -127,5 +157,7 @@
         private System.Windows.Forms.Panel panel3;
         private OpenGL.GlControl openGL_control;
         private System.Windows.Forms.Button resetBtn;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }
