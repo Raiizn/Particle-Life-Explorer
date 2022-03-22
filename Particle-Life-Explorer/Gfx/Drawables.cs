@@ -2,19 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Numerics;
 
 namespace Particle_Life_Explorer.Gfx
 {
+
+    interface IDrawable
+    {
+        void SetDrawColor(Color color);
+        void Render(Matrix4x4f projection, Vector2 pos);
+    }
+
+
     /// <summary>
     /// Renders a circle to a given coordinate
     /// </summary>
-    internal class Circle
+    internal class Circle : IDrawable
     {
         static float[] shared_vertices = null;
-        ShaderProgram shader;
-        VertexArray vertexArray;
-
-
         private static void GenerateGeometry(int vertex_count=20)
         {
             List<float> buffer = new List<float>();
@@ -27,6 +32,10 @@ namespace Particle_Life_Explorer.Gfx
         }
 
 
+        ShaderProgram shader;
+        VertexArray vertexArray;
+        public float Radius { get; set; }
+
         public Circle(ShaderProgram glProgram, float radius)
         {
             if (shared_vertices == null)
@@ -38,11 +47,6 @@ namespace Particle_Life_Explorer.Gfx
         }
 
 
-        public float Radius
-        {
-            get; set;
-        }
-
 
         public void SetDrawColor(Color color)
         {
@@ -51,10 +55,10 @@ namespace Particle_Life_Explorer.Gfx
         }
 
 
-        public void Render(Matrix4x4f projection, float[] pos)
+        public void Render(Matrix4x4f projection, Vector2 pos)
         {
             Gl.BindVertexArray(vertexArray.ArrayName);
-            Matrix4x4f translation = Matrix4x4f.Translated(pos[0], pos[1], 0.0f);
+            Matrix4x4f translation = Matrix4x4f.Translated(pos.X, pos.Y, 0.0f);
             Matrix4x4f scale = Matrix4x4f.Scaled(Radius, Radius, 1);
 
             Gl.UniformMatrix4f(shader.LocationMVP, 1, false, (scale * translation) * projection);

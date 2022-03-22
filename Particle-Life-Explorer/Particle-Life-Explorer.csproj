@@ -45,7 +45,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gfx\Circle.cs" />
+    <Compile Include="Gfx\Drawables.cs" />
     <Compile Include="Gfx\GlAbstractions.cs" />
     <Compile Include="Gfx\GlShaders.cs" />
     <Compile Include="Gfx\Viewport.cs" />
@@ -56,8 +56,10 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Sim\Interaction.cs" />
     <Compile Include="Sim\Particle.cs" />
     <Compile Include="Sim\Simulation.cs" />
+    <Compile Include="Utility\Collision.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
