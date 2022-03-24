@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using OpenGL;
 using Particle_Life_Explorer.Gfx;
+using Particle_Life_Explorer.Properties;
 using Particle_Life_Explorer.Sim;
 using System;
 using System.Collections.Generic;
@@ -23,11 +24,16 @@ namespace Particle_Life_Explorer
         int PIXELS_PER_UNIT = 8;
         Vector2 initial_size;
         IDrawable partGfx = null;
-
+        bool linear_forces = false;
         public MainForm()
         {
             InitializeComponent();
+            Select();
             random = new Random();
+            play_btn.Size = new Size(42, 42);
+            speed_btn.Size = new Size(42, 42);
+            popout_interaction_btn.Size = new Size(42, 42);
+            btn_settings.Size = new Size(42, 42);
         }
 
 
@@ -40,7 +46,7 @@ namespace Particle_Life_Explorer
         void CreateSimulation()
         {
             GlControl glControl = openGL_control;
-            float friction = 0.125f;
+            float friction = 0.1f;
             int particle_count = 200;
             // Set up the different particle types
             ParticleClass.ResetIndices();
@@ -56,10 +62,10 @@ namespace Particle_Life_Explorer
             simulation = new Simulation(PIXELS_PER_UNIT, initial_size.X, initial_size.Y, particle_types, particle_count, friction);
 
             // Interaction parameters for the randomly generated forces
-            Vector2 min_range = new Vector2(0, 15);
-            Vector2 max_range = new Vector2(15, 45);
+            Vector2 min_range = new Vector2(0, 25);
+            Vector2 max_range = new Vector2(25, 75);
             Vector2 strength_range = new Vector2(-0.25f, 0.25f);
-            bool use_linear = false;
+            bool use_linear = linear_forces;
 
             // Create the interactions
             List<InteractionDef> interactions = new List<InteractionDef>();
@@ -166,11 +172,13 @@ namespace Particle_Life_Explorer
             var gfx = simulation.PartGraphic;
             CreateSimulation();
             simulation.SetParticleGraphic(gfx);
+            openGL_control.Focus();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             simulation.ReseedParticles(200);
+            openGL_control.Focus();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -183,9 +191,9 @@ namespace Particle_Life_Explorer
             Dictionary<string, object> values = new Dictionary<string, object>();
             List<ParticleClass> particles = new List<ParticleClass>(simulation.ParticleClasses);
             List<object> interactions = new List<object>();
+           
             values["Particles"] = particles;
             values["Interactions"] = interactions;
-
             foreach(var partA in particles)
             {
                 foreach(var partB in particles)
@@ -194,14 +202,86 @@ namespace Particle_Life_Explorer
                     if (interaction != null)
                         interactions.Add(new Dictionary<string, object>()
                         {
-                            {"left", partA.Name },
-                            {"right", partB.Name },
-                            {"value", interaction }
+                            {"self", partA.Name },
+                            {"other", partB.Name },
+                            {"force", interaction }
                         });
                 }
             }
+
+            values["Universe"] = new Dictionary<string, object>()
+            {
+                {"friction", simulation.Friction },
+                {"width", simulation.Width },
+                {"height", simulation.Height },
+            };
             string json = JsonConvert.SerializeObject(values, json_settings);
             File.WriteAllText(path, json);
+            openGL_control.Focus();
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            linear_forces = checkBox1.Checked;
+            foreach (var interaction in simulation.Interactions)
+                interaction.exponent = linear_forces ? 1 : 2;
+        }
+
+        private void play_btn_Click(object sender, EventArgs e)
+        {
+            if (simulation.Speed != 1)
+            {
+                simulation.ChangeSpeed(1);
+                play_btn.BackgroundImage = Resources.icon_pause;
+            }
+            else 
+            {
+                simulation.ChangeSpeed(0);
+                play_btn.BackgroundImage = Resources.icon_play;
+            }
+            openGL_control.Focus();
+        }
+
+        private void speed_btn_Click(object sender, EventArgs e)
+        {
+            if(simulation.Speed < 6)
+            {
+                play_btn.BackgroundImage = Resources.icon_play;
+                simulation.ChangeSpeed(6);
+            }
+            else
+            {
+                simulation.ChangeSpeed(1);
+                play_btn.BackgroundImage = Resources.icon_pause;
+            }
+        }
+
+        private void popout_interaction_btn_Click(object sender, EventArgs e)
+        {
+            if (openGL_control.ParentForm == this)
+            {
+                openGL_parent = openGL_control.Parent;
+                Form form = new Form();
+                Size size = openGL_control.Size;
+                form.Controls.Add(openGL_control);
+                form.Show();
+                form.FormClosing += delegate (object s, FormClosingEventArgs ev)
+                  {
+                      openGL_parent.Controls.Add(openGL_control);
+                  };
+
+                form.Size = size;
+                popout_interaction_btn.BackgroundImage = Resources.icon_popin;
+                form.Focus();
+            }
+            else
+            {
+                openGL_control.ParentForm.Close();
+                popout_interaction_btn.BackgroundImage = Resources.icon_popout;
+                this.Focus();
+            }
+        }
+
+        Control openGL_parent = null;
     }
 }

@@ -138,7 +138,7 @@ namespace Particle_Life_Explorer.Sim
             // Determine force to apply for this interaction
             float force = 0;
             if (distance <= 1)
-                force = -1f * (float)Math.Max(0.2f, Math.Pow(velocity.Length(), 1f)) / distance*distance; // Repelling force for close particles
+                force = -1f * (velocity.Length() + other.velocity.Length())/2; // Repelling force for close particles
             else
                 force = type.GetAttraction(interaction, distance); // Interaction based force
 

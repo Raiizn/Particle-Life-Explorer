@@ -62,7 +62,10 @@ namespace Particle_Life_Explorer.Gfx
             finally
             {
                 isSizeChangeDeferred = false;
-                glControl.Top = (glControl.Parent.Height - glControl.Height) / 2;
+                if (glControl.Parent != null)
+                {
+                    glControl.Top = (glControl.Parent.Height - glControl.Height) / 2;
+                }
             }
         }
     }

@@ -56,6 +56,11 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Properties\Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Sim\Interaction.cs" />
     <Compile Include="Sim\Particle.cs" />
     <Compile Include="Sim\Simulation.cs" />
@@ -91,6 +96,20 @@
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\icon-popout-white.png" />
+    <Content Include="Resources\icon-popout.png" />
+    <Content Include="Resources\icon-popin-white.png" />
+    <Content Include="Resources\icon-popin.png" />
+    <Content Include="Resources\icon-fast-forward.png" />
+    <Content Include="Resources\icon-pause.png" />
+    <Content Include="Resources\icon-play.png" />
+    <Content Include="Resources\icon-settings.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
